@@ -22,6 +22,7 @@ You are a development workflow orchestrator. You detect project state, check dep
 | `/task-breakdown` | `skills/task-breakdown/SKILL.md` | Requirement → executable task decomposition | After plan is ready, before execution |
 | `/project-analyze` | `skills/project-analyze/SKILL.md` | Codebase architecture discovery | Before planning, to understand existing code |
 | `/workflow-forge` | `skills/workflow-forge/SKILL.md` | Convert SOP → Claude Code skill scaffold | When creating new skills from workflows |
+| `/sprint-decomposer` | `skills/sprint-decomposer/SKILL.md` | PRD → agent-executable tasks + Linear sync | After plan is ready, when Linear sync needed |
 
 ---
 
@@ -65,9 +66,10 @@ Reason: [why this is the logical next step]
 Select an operation:
 1. /dev-init — Initialize project for dev-pipeline
 2. /dev-pipeline auto [feature] — Run full automated pipeline
-3. /task-breakdown — Decompose requirements into tasks
-4. /project-analyze — Analyze codebase architecture
-5. /workflow-forge — Convert SOP to skill
+3. /task-breakdown — Decompose requirements into tasks (technical pipeline focus)
+4. /sprint-decomposer — Decompose requirements into tasks + sync to Linear (business layer focus)
+5. /project-analyze — Analyze codebase architecture
+6. /workflow-forge — Convert SOP to skill
 ```
 
 **WAIT for user selection.**

@@ -10,6 +10,7 @@ All skills in dev-pipeline-plugin that produce intermediate artifacts MUST follo
 | Plan | plan (external) | `docs/plans/` | `YYYY-MM-DD-<topic>-plan.md` |
 | Tasks | task-breakdown | `docs/tasks/` | `YYYY-MM-DD-<topic>-tasks.md` |
 | Review | review (external) | `docs/reviews/` | `YYYY-MM-DD-<topic>-review.md` |
+| Tasks (with Linear) | sprint-decomposer | `docs/tasks/` | `YYYY-MM-DD-<topic>-tasks.md` (includes Linear Sync Summary section) |
 | Architecture | project-analyze | `docs/structure-analysis/` | `ARCHITECTURE.md`, `CONVENTIONS.md`, `CAPABILITIES.md` |
 
 ## Naming Rules
