@@ -1,0 +1,15 @@
+{
+  "name": "cc-autodev-harness",
+  "description": "Automated development pipeline plugin for Claude Code. From requirements to merged PR with minimal manual intervention.",
+  "owner": {
+    "name": "qiuyanxin"
+  },
+  "plugins": [
+    {
+      "name": "dev-pipeline",
+      "source": "./plugins/dev-pipeline",
+      "description": "Automated development pipeline: brainstorm → plan → task-breakdown → worktree → parallel execution → verification → review → integration.",
+      "version": "1.0.0"
+    }
+  ]
+}
