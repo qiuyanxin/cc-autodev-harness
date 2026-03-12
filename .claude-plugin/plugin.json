@@ -1,5 +1,10 @@
 {
   "name": "dev-pipeline",
   "version": "1.0.0",
-  "description": "Automated development pipeline: brainstorm → plan → task-breakdown → worktree → parallel execution → verification → review → integration. Includes project initialization, architecture analysis, and SOP-to-skill generation."
+  "description": "Automated development pipeline: brainstorm → plan → task-breakdown → worktree → parallel execution → verification → review → integration. Includes project initialization, architecture analysis, and SOP-to-skill generation.",
+  "author": {
+    "name": "qiuyanxin"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/qiuyanxin/cc-autodev-harness"
 }
