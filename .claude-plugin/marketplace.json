@@ -10,6 +10,12 @@
       "source": "./plugins/dev-pipeline",
       "description": "Automated development pipeline: brainstorm → plan → task-breakdown → worktree → parallel execution → verification → review → integration.",
       "version": "1.0.0"
+    },
+    {
+      "name": "self-evolution",
+      "source": "./plugins/self-evolution",
+      "description": "Self-evolution system: captures tool failures, injects project-specific rules per prompt, evolves development rules through recursive analysis.",
+      "version": "1.0.0"
     }
   ]
 }

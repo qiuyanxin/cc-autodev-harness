@@ -1,0 +1,17 @@
+{
+  "_meta": {
+    "version": 1,
+    "lastEvolved": null,
+    "totalFeedbackProcessed": 0,
+    "description": "Project-specific rule bank. Updated by /evolve-rules skill. Read by inject-skills hook."
+  },
+  "domainKeywords": {
+    "build": "build|deploy|lint|test|compile|ci|cd",
+    "style": "theme|style|color|font|css|tailwind|dark.?mode"
+  },
+  "commonMistakes": {
+    "general": [],
+    "build": [],
+    "style": []
+  }
+}

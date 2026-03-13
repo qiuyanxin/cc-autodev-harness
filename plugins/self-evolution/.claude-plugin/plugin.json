@@ -1,0 +1,16 @@
+{
+  "name": "self-evolution",
+  "version": "1.0.0",
+  "description": "Self-evolution system for Claude Code — automatically captures failures, injects project-specific rules per prompt, and evolves development rules through recursive analysis.",
+  "author": {
+    "name": "qiuyanxin"
+  },
+  "license": "MIT",
+  "keywords": [
+    "self-evolution",
+    "skill-bank",
+    "common-mistakes",
+    "failure-capture",
+    "rule-injection"
+  ]
+}
