@@ -122,6 +122,149 @@ skill-bank.json 中的 commonMistakes
     └── archive/            # 已处理的反馈归档
 ```
 
+## Hook 输入输出格式
+
+所有 hooks 通过 **stdin** 接收 JSON，通过 **stdout** 输出注入到 Claude 上下文的文本。
+
+### inject-skills.sh (UserPromptSubmit)
+
+**输入 (stdin):**
+```json
+{
+  "prompt": "用户的原始输入文本",
+  "cwd": "/Users/you/code/myproject"
+}
+```
+
+**输出 (stdout):** 匹配到规则时输出 XML block，Claude 会将其作为上下文接收：
+```xml
+<skill-bank-context>
+Known issues for this project (avoid these):
+- 规则 1
+- 规则 2
+</skill-bank-context>
+```
+
+无匹配或 `general` 为空时无输出。
+
+### capture-failure.sh (PostToolUseFailure)
+
+**输入 (stdin):**
+```json
+{
+  "tool_name": "Bash",
+  "tool_input": { "command": "pnpm build" },
+  "error": "Error: Module not found...",
+  "session_id": "abc123",
+  "cwd": "/Users/you/code/myproject"
+}
+```
+
+**输出:** 无 stdout 输出（async hook）。写入 `failures.jsonl`：
+```json
+{"ts":"2026-03-13T10:00:00Z","session":"abc123","tool":"Bash","input":{"command":"pnpm build"},"error":"Error: Module not found..."}
+```
+
+### pre-compact-learn.sh (PreCompact)
+
+**输入 (stdin):**
+```json
+{
+  "cwd": "/Users/you/code/myproject"
+}
+```
+
+**输出 (stdout):** 固定提醒文本：
+```xml
+<pre-compact-reminder>
+Context is about to be compacted. Before losing session details, check:
+1. Did you make mistakes the user corrected? → Save to memory/feedback_*.md
+2. Did you discover project patterns worth remembering? → Save to memory/
+3. If you created new memory files, update MEMORY.md index.
+</pre-compact-reminder>
+```
+
+### init-project-data.sh (SessionStart)
+
+**输入 (stdin):**
+```json
+{
+  "cwd": "/Users/you/code/myproject"
+}
+```
+
+**输出:** 无。静默创建目录和文件。
+
+## 自定义 Domain
+
+在 `skill-bank.json` 中添加新 domain 只需两步：
+
+1. **添加关键词模式**（`domainKeywords`）：
+```json
+"domainKeywords": {
+  "build": "build|deploy|lint|test|compile|ci|cd",
+  "style": "theme|style|color|font|css|tailwind|dark.?mode",
+  "database": "db|database|migration|prisma|supabase|postgres"
+}
+```
+
+2. **添加规则列表**（`commonMistakes`）：
+```json
+"commonMistakes": {
+  "general": ["规则始终注入"],
+  "build": ["pnpm build 前先 cd 到子项目"],
+  "style": ["Tailwind v4 不再需要 @tailwind 指令"],
+  "database": ["migration 前先备份"]
+}
+```
+
+关键词模式支持正则（grep -iE），大小写不敏感。
+
+## 手动添加反馈
+
+除了自动捕获失败，你也可以手动添加反馈供 `/evolve-rules` 分析：
+
+```bash
+# 在项目数据目录创建反馈文件
+cat > ~/.claude/projects/-Users-you-code-myproject/memory/feedback_auth-bug.md << 'EOF'
+---
+name: auth-bug-fix
+description: Supabase auth token 过期时不应该静默失败
+type: feedback
+---
+
+Supabase auth token 过期后，API 请求静默返回空数据而非 401 错误。
+
+**Why:** 之前 Claude 修 bug 时没有检查 token 过期场景，导致数据丢失。
+**How to apply:** 所有 Supabase 请求需要先检查 session 有效性。
+EOF
+```
+
+`/evolve-rules` 会读取所有 `feedback_*.md` 文件，提炼后归档到 `memory/archive/`。
+
+## ${CLAUDE_PLUGIN_ROOT} 机制
+
+`hooks.json` 中使用 `${CLAUDE_PLUGIN_ROOT}` 环境变量引用脚本路径：
+
+```json
+"command": "${CLAUDE_PLUGIN_ROOT}/hooks/inject-skills.sh"
+```
+
+Claude Code 在执行 hook 时，会自动将 `${CLAUDE_PLUGIN_ROOT}` 替换为插件的实际安装路径。这保证了：
+- 插件从 GitHub 安装或本地目录安装都能正常工作
+- 脚本路径不需要硬编码
+- 多用户环境下路径自动适配
+
+## 排错
+
+| 问题 | 原因 | 解决 |
+|------|------|------|
+| `inject-skills.sh` 无输出 | skill-bank.json 不存在或规则为空 | 检查项目数据目录下是否有 skill-bank.json |
+| `jq: command not found` | 未安装 jq | `brew install jq` |
+| hook 超时 | skill-bank.json 过大或磁盘慢 | 清理 failures.jsonl，运行 /evolve-rules |
+| 新项目无 skill-bank | init-project-data.sh 未触发 | 确认插件已启用：`settings.json` 中 `"self-evolution@cc-autodev-harness": true` |
+| 规则未注入 | prompt 关键词未命中 domainKeywords | 检查 domainKeywords 正则是否覆盖你的用词 |
+
 ## 依赖
 
 - `jq` — hooks 解析 JSON 输入和 skill-bank.json（`brew install jq`）
