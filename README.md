@@ -15,7 +15,7 @@ Restart Claude Code after installation.
 
 | Plugin | Description |
 |--------|-------------|
-| **dev-pipeline** | Automated 8-step pipeline: brainstorm → plan → task-breakdown → worktree → parallel execution → verification → review → integration |
+| **dev-pipeline** | Automated 8-step pipeline: brainstorm → plan → task-breakdown → worktree → parallel execution → verification → review → integration. Includes `/sprint-decomposer` for PRD → Linear issue auto-sync |
 | **self-evolution** | 自进化系统：自动捕获失败、按需注入项目规则、递归进化开发经验 |
 
 ### dev-pipeline
@@ -24,6 +24,15 @@ Restart Claude Code after installation.
 
 ```bash
 claude plugin install dev-pipeline@cc-autodev-harness
+```
+
+**亮点能力 — Linear Issue 自动同步：**
+
+通过 `/sprint-decomposer` 将 PRD 拆解为 agent 可执行任务，并自动通过 Linear GraphQL API 创建 issue（含 labels、优先级、阻塞关系）。设置 `LINEAR_API_KEY` 环境变量即可启用。
+
+```bash
+/sprint-decomposer @docs/PRD-feature.md    # 拆解 + 同步到 Linear
+/sprint-decomposer --sync-only             # 仅同步已有任务
 ```
 
 See [dev-pipeline README](./plugins/dev-pipeline/README.md) for full documentation.

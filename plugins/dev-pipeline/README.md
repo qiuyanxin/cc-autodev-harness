@@ -36,6 +36,7 @@ claude plugin install dev-pipeline@cc-autodev-harness
 | **dev-pipeline** | `/dev-pipeline` | Router + full pipeline orchestration. Detects project state and routes to the right skill, or runs the complete 8-step automated pipeline |
 | **dev-init** | `/dev-init` | Initialize any project (new or existing) for the dev-pipeline workflow. Auto-detects tech stack, generates `.claude/` config (CLAUDE.md, settings.json, path-scoped rules) |
 | **task-breakdown** | `/task-breakdown` | Convert requirements into dev-executable task documents with Pipeline flow diagrams, dependency graphs, and task cards (granularity ≤ 1 day) |
+| **sprint-decomposer** | `/sprint-decomposer` | PRD → agent-executable tasks + Linear issue sync. 6-layer business analysis, auto-creates issues with labels, priorities, and blocking relations via Linear GraphQL API |
 | **project-analyze** | `/project-analyze` | Discover codebase architecture: layers, module boundaries, isolation relationships, reusable capabilities. Outputs ARCHITECTURE.md, CONVENTIONS.md, CAPABILITIES.md |
 | **workflow-forge** | `/workflow-forge` | Transform any SOP or workflow into Claude Code skill scaffolds. Supports 4 maturity levels (L0 Seed → L3 Ecosystem) |
 
@@ -62,6 +63,7 @@ Claude will:
 ```bash
 /dev-pipeline          # See current state, get next-step recommendation
 /task-breakdown        # Decompose a requirement doc into tasks
+/sprint-decomposer    # PRD → tasks + auto-sync to Linear
 /project-analyze       # Understand an unfamiliar codebase
 /workflow-forge        # Turn a workflow into a reusable skill
 ```
@@ -81,6 +83,30 @@ Claude will:
 - Generate `.claude/CLAUDE.md` with build commands and workflow config
 - Create path-scoped rules for monorepo subprojects
 - Check and install missing plugin dependencies
+
+## Sprint Decomposer — Linear Issue Sync
+
+`/sprint-decomposer` 将 PRD 或需求文档自动拆解为开发任务，并通过 Linear GraphQL API 批量创建 issue。
+
+```bash
+# 从 PRD 拆解并同步到 Linear
+/sprint-decomposer @docs/PRD-website-builder.md
+
+# 仅同步已有任务文档到 Linear
+/sprint-decomposer --sync-only
+```
+
+**工作流程：**
+
+1. **6 层业务分析** — 按数据层、接口层、业务逻辑层等 6 个维度盘点现有能力与缺口
+2. **工作项拆解** — 生成粒度 ≤ 1 天的 agent 可执行任务，含验收标准和依赖关系
+3. **依赖图构建** — ASCII 依赖图 + 关键路径识别 + 可并行任务分组
+4. **Linear 同步** — 自动创建：
+   - **Labels**: 按业务层 (L1-L6) + 角色标签
+   - **Issues**: 每个工作项一个 issue，含完整 spec、优先级 (P1-P4)、状态映射
+   - **Blocking Relations**: 根据依赖图自动建立阻塞关系
+
+**前置条件：** 设置环境变量 `LINEAR_API_KEY`。未设置时跳过同步，任务文档仍然生成。
 
 ## Dependencies
 
@@ -186,6 +212,12 @@ plugins/dev-pipeline/
 │   │   └── references/
 │   │       ├── output-template.md
 │   │       └── quality-checklist.md
+│   ├── sprint-decomposer/        ← PRD → Tasks + Linear sync
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── layer-analysis-model.md
+│   │       ├── work-item-spec-template.md
+│   │       └── linear-api-patterns.md
 │   ├── project-analyze/           ← Architecture discovery (117 lines)
 │   │   ├── SKILL.md
 │   │   └── references/
